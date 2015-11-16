@@ -35,7 +35,8 @@
             .then(embedFonts)
             .then(inlineImages)
             .then(function (clone) {
-                return makeSvgDataUri(clone, node.scrollWidth, node.scrollHeight);
+                var dimensions = util.getDimensions(node, options);
+                return makeSvgDataUri(clone, dimensions.width, dimensions.height);
             });
     }
 
@@ -228,8 +229,9 @@
             .then(util.delay(100))
             .then(function (image) {
                 var canvas = document.createElement('canvas');
-                canvas.width = domNode.scrollWidth;
-                canvas.height = domNode.scrollHeight;
+                var dimensions = util.getDimensions(domNode, options);
+                canvas.width = dimensions.width;
+                canvas.height = dimensions.height;
                 canvas.getContext('2d').drawImage(image, 0, 0);
                 return canvas;
             });
@@ -249,7 +251,8 @@
             delay: delay,
             asArray: asArray,
             escapeXhtml: escapeXhtml,
-            makeImage: makeImage
+            makeImage: makeImage,
+            getDimensions: getDimensions
         };
 
         function mimes() {
@@ -410,6 +413,19 @@
 
         function escapeXhtml(string) {
             return string.replace(/#/g, '%23').replace(/\n/g, '%0A');
+        }
+
+        function getDimensions(node, options) {
+          var options = options || {};
+          var width = options.width                      ? options.width :
+                      node.getBoundingClientRect().width ? Math.round(node.getBoundingClientRect().width) :
+                                                           node.scrollWidth;
+
+          var height = options.height                      ? options.height :
+                       node.getBoundingClientRect().height ? Math.round(node.getBoundingClientRect().height) :
+                                                             node.scrollWidth;
+
+          return {width: width, height: height};
         }
     }
 
