@@ -228,11 +228,10 @@
             .then(util.makeImage)
             .then(util.delay(100))
             .then(function (image) {
-                var canvas = document.createElement('canvas');
-                var dimensions = util.getDimensions(domNode, options);
-                canvas.width = dimensions.width;
-                canvas.height = dimensions.height;
-                canvas.getContext('2d').drawImage(image, 0, 0);
+                var canvas = util.prepareCanvas(domNode, options);
+                var ctx = canvas.getContext('2d');
+
+                ctx.drawImage(image, 0, 0);
                 return canvas;
             });
     }
@@ -252,7 +251,8 @@
             asArray: asArray,
             escapeXhtml: escapeXhtml,
             makeImage: makeImage,
-            getDimensions: getDimensions
+            getDimensions: getDimensions,
+            prepareCanvas: prepareCanvas
         };
 
         function mimes() {
@@ -426,6 +426,24 @@
                                                              node.scrollWidth;
 
           return {width: width, height: height};
+        }
+
+        function prepareCanvas(node, options) {
+          var options = options || {};
+          var canvas = document.createElement('canvas');
+          var dimensions = getDimensions(node, options);
+          var ctx = canvas.getContext('2d');
+          
+          canvas.width = dimensions.width;
+          canvas.height = dimensions.height;
+
+          if (options.background) {
+            ctx.rect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = options.background;
+            ctx.fill(); 
+          }
+
+          return canvas;
         }
     }
 
