@@ -9,6 +9,7 @@
     global.domtoimage = {
         toSvg: toSvg,
         toPng: toPng,
+        toJpg: toJpg,
         toBlob: toBlob,
         impl: {
             fontFaces: fontFaces,
@@ -49,6 +50,21 @@
         return draw(node, options)
             .then(function (canvas) {
                 return canvas.toDataURL();
+            });
+    }
+
+    /**
+     * @param {Node} node - The DOM Node object to render
+     * @param {Object} options - Rendering options, @see {@link toSvg}
+     * @return {Promise} - A promise that is fulfilled with a JPG image data URL
+     * */
+    function toJpg(node, options) {
+        var options = options || {};
+        var quality = options.quality || 1.0;
+
+        return draw(node, options)
+            .then(function (canvas) {
+                return canvas.toDataURL("image/jpeg", quality);
             });
     }
 
